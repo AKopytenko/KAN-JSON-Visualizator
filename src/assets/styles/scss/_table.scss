@@ -1,0 +1,28 @@
+.table {
+
+    color: $text_main;
+
+    &__head {
+
+        font-size: 0.75rem;
+        color: lighten($text_main, 20%);
+    }
+
+    &__row {
+
+        background-color: #d0d4d6;
+
+        &--odd {
+
+            background-color: #f0f0f0;
+        }
+    }
+
+    &__col {
+
+        &-label {
+
+            color: #999
+        }
+    }
+}

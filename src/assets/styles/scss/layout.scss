@@ -1,0 +1,19 @@
+@import 'bootstrap';
+@import '@/assets/styles/scss/_variables';
+@import '@/assets/styles/scss/_table';
+
+body {
+
+    background-color: $bg_main;
+}
+
+.has-rounded {
+
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.has-shadow {
+
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
