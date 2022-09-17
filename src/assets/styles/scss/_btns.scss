@@ -1,0 +1,16 @@
+@import '@/assets/styles/scss/_variables';
+
+.btn {
+
+    &--primary {
+
+        background-color: $bg_main;
+        color: #ddd;
+
+        &:hover {
+
+            background-color: lighten($bg_main, 10%) !important;
+            color: #ddd !important
+        }
+    }
+}

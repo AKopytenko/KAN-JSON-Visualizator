@@ -137,5 +137,10 @@ export default {
                 "lastOperDt": "2019-08-14T10:04:00.000Z"
             }
         ]
+    },
+
+    mutations: {
+
+        setFile: (state, data) => state.file = data
     }
 }

@@ -34,7 +34,13 @@
                         </div>
                         <div class="table__body">
                             <template v-if="filteredList.length">
-                                <div class="row table__row" v-for="(row, index) in filteredList" :key="index" :class="{ 'table__row--odd' : index % 2 == 0 }">
+                                <div 
+                                    class="row table__row" 
+                                    v-for="(row, index) in filteredList" 
+                                    :key="index" 
+                                    :class="{ 'table__row--odd' : index % 2 == 0 }"
+                                    @dblclick="editRow = row, showEditRow = true"
+                                >
                                     <div class="col-12 col-sm-6 col-md-4 col-xl-1 table__col">
                                         <div class="table__col-label d-block d-xl-none">№ п/п: </div>
                                         {{ row.ordNumber || "-" }}
@@ -90,12 +96,27 @@
             </div>
         </div>
 
+        <transition name="bounce">
+            <KJVModal 
+                v-if="showEditRow"
+                header="Редактирование"
+                size="lg"
+                @closeModal="showEditRow = false"
+            >
+                <template v-slot:body>
+                    <KJVTableEdit :editRow="editRow" @closeModal="showEditRow = false" />
+                </template>
+            </KJVModal>
+        </transition>
+
     </div>
 
 </template>
 
 <script>
 import { mapState } from 'vuex'
+import KJVModal     from '@/components/KJVModal'
+import KJVTableEdit from '@/components/KJVTableEdit'
 
 export default {
 
@@ -105,9 +126,18 @@ export default {
 
         return {
 
-            searchMode: "all",
-            searchText: ""
+            editRow:        null,
+            showEditRow:    false,
+
+            searchMode:     "all",
+            searchText:     ""
         }
+    },
+
+    components: {
+
+        KJVModal,
+        KJVTableEdit
     },
 
     computed: {

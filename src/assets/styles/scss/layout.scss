@@ -1,6 +1,7 @@
 @import 'bootstrap';
 @import '@/assets/styles/scss/_variables';
 @import '@/assets/styles/scss/_table';
+@import '@/assets/styles/scss/_btns';
 
 body {
 
@@ -16,4 +17,30 @@ body {
 .has-shadow {
 
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+/**
+ * Анимация всплывающих окон
+ */
+ .bounce-enter-active {
+    animation: bounce-in .1s ease-out both;
+    .modal-container {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+}
+.bounce-leave-active {
+    animation: bounce-in .1s reverse ease-in both;
+    .modal-container {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+}
+@keyframes bounce-in {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
