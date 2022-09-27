@@ -218,8 +218,6 @@ export default {
 
         if(this.editRow.lastOperDt) {
 
-            console.log('Входное: ', this.editRow.lastOperDt)
-
             const d     = new Date(this.editRow.lastOperDt)
 
             let year    = d.getFullYear(),
@@ -230,11 +228,6 @@ export default {
 
             this.lastOperDt = `${year}-${month}-${day}T${hours}:${minutes}`
 
-            console.log(this.lastOperDt)
-
-        } else {
-
-            this.lastOperDt = null
         }
     },
 

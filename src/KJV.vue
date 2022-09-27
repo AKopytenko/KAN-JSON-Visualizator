@@ -2,11 +2,11 @@
 
     <div class="container">
 
-        <!-- <KJVUploader />
-
-        <KJVDiagram /> -->
+        <!-- <KJVUploader /> -->
 
         <KJVTable />
+
+        <KJVDiagram />
 
     </div>
 
@@ -15,7 +15,7 @@
 <script>
 
 // import KJVUploader  from '@/components/KJVUploader.vue'
-// import KJVDiagram   from '@/components/KJVDiagram.vue'
+import KJVDiagram   from '@/components/KJVDiagram.vue'
 import KJVTable     from '@/components/KJVTable.vue'
 
 export default {
@@ -25,8 +25,8 @@ export default {
     components: {
 
         // KJVUploader,
-        // KJVDiagram,
-        KJVTable
+        KJVTable,
+        KJVDiagram
     }
 }
 </script>
