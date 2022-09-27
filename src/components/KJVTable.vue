@@ -151,31 +151,38 @@ export default {
 
             let result = this.file
 
-            if(this.searchText.length > 2) {
+            if(result) {
 
-                if(this.searchMode == 'all') {
+                if(this.searchText.length > 2) {
 
-                    result = this.file.filter(item => {
+                    if(this.searchMode == 'all') {
 
-                        if(
-                            String(item.carNumber).includes(this.searchText)        || 
-                            String(item.trainIndex).includes(this.searchText)       || 
-                            String(item.trainNumber).includes(this.searchText)      || 
-                            String(item.invoiceNumber).includes(this.searchText)    || 
-                            String(item.invoiceId).includes(this.searchText)
-                        ) {
+                        result = this.file.filter(item => {
 
-                            return item
-                        }
-                    })
+                            if(
+                                String(item.carNumber).includes(this.searchText)        || 
+                                String(item.trainIndex).includes(this.searchText)       || 
+                                String(item.trainNumber).includes(this.searchText)      || 
+                                String(item.invoiceNumber).includes(this.searchText)    || 
+                                String(item.invoiceId).includes(this.searchText)
+                            ) {
 
-                } else {
+                                return item
+                            }
+                        })
 
-                    result = this.file.filter(item => String(item[this.searchMode]).includes(this.searchText))
+                    } else {
+
+                        result = this.file.filter(item => String(item[this.searchMode]).includes(this.searchText))
+                    }
                 }
-            }
 
-            return result
+                return result
+
+            } else {
+
+                return []
+            }
         }
     }
 }

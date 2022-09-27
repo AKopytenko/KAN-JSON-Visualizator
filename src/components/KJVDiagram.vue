@@ -1,11 +1,10 @@
 <template>
-
     <div class="kjv-diagram my-4 p-3">
-        <div class="kjv-diagram__wrapper has-shadow has-rounded">
-            <apexchart width="500" type="pie" :options="options" :series="series"></apexchart>
+        <div class="kjv-diagram__wrapper p-3 has-shadow has-rounded text-center">
+            <h3 class="mt-2 mb-4 kjv-diagram__header">Распределение данных по STATE ID</h3>
+            <apexchart width="500" type="pie" :options="options" :series="series" style="margin: 0 auto"></apexchart>
         </div>
     </div>
-
 </template>
 
 <script>

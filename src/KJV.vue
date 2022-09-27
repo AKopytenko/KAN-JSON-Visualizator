@@ -2,11 +2,9 @@
 
     <div class="container">
 
-        <!-- <KJVUploader /> -->
-
         <KJVTable />
-
-        <KJVDiagram />
+        <KJVDiagram v-if="file.length" />
+        <KJVUploader />
 
     </div>
 
@@ -14,9 +12,11 @@
 
 <script>
 
-// import KJVUploader  from '@/components/KJVUploader.vue'
-import KJVDiagram   from '@/components/KJVDiagram.vue'
+import { mapActions, mapState } from 'vuex'
+
 import KJVTable     from '@/components/KJVTable.vue'
+import KJVDiagram   from '@/components/KJVDiagram.vue'
+import KJVUploader  from '@/components/KJVUploader.vue'
 
 export default {
 
@@ -24,9 +24,35 @@ export default {
 
     components: {
 
-        // KJVUploader,
         KJVTable,
-        KJVDiagram
+        KJVDiagram,
+        KJVUploader
+    },
+
+    computed: {
+
+        ...mapState({
+
+            file: state => state.uploader.file
+        })
+    },
+
+    methods: {
+
+        ...mapActions([
+
+            'readFile'
+        ])
+    },
+
+    mounted() {
+
+        if(localStorage.getItem('KJV_DATA')) {
+
+            console.log('Есть дата')
+
+            this.readFile()
+        }
     }
 }
 </script>

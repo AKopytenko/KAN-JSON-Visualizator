@@ -1,4 +1,10 @@
 .kjv-uploader {
 
-    
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+
+    &__wrapper {
+
+        background-color: #d0d4d6;
+    }
 }
