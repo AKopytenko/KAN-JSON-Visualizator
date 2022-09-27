@@ -54,7 +54,7 @@
 
             <div class="form-group mb-4 col-12 col-md-6">
                 <label for="lastOperDt">Дата-время операции</label>
-                <input type="text" class="form-control" id="lastOperDt" v-model="lastOperDt">
+                <input type="datetime-local" class="form-control" id="lastOperDt" v-model="lastOperDt">
             </div>
 
             <div class="form-group mb-4 col-12 col-md-6">
@@ -139,6 +139,21 @@ export default {
             'setTableEditMsg'
         ]),
 
+        /**
+         * setStartZero
+         * 
+         * Ставит ведущий ноль в месяц и число
+         * 
+         * @param {Number} value - входящее значение
+         * @return {String} - входящее число >=2 или двухзначное число с ведущим нулём
+         */
+        setStartZero(value) {
+
+            value = String(value)
+
+            return value.length == 1 ? '0' + value : value
+        },
+
         submitForm() {
 
             this.formInvalids = {}
@@ -200,7 +215,27 @@ export default {
         this.invoiceId      = this.editRow.invoiceId
         this.invoiceNumber  = this.editRow.invoiceNumber
         this.stateId        = this.editRow.stateId
-        this.lastOperDt     = this.editRow.lastOperDt
+
+        if(this.editRow.lastOperDt) {
+
+            console.log('Входное: ', this.editRow.lastOperDt)
+
+            const d     = new Date(this.editRow.lastOperDt)
+
+            let year    = d.getFullYear(),
+                month   = this.setStartZero(d.getMonth() + 1),
+                day     = this.setStartZero(d.getDate()),
+                hours   = d.getHours(),
+                minutes = d.getMinutes()
+
+            this.lastOperDt = `${year}-${month}-${day}T${hours}:${minutes}`
+
+            console.log(this.lastOperDt)
+
+        } else {
+
+            this.lastOperDt = null
+        }
     },
 
     beforeUnmount() {

@@ -11,8 +11,8 @@
                 <option value="invoiceNumber">№ накладной</option>
                 <option value="invoiceId">ИД накладной</option>
             </select>
-            <input type="text" class="form-control kjv-table__search-input" aria-label="Text input with 2 dropdown buttons" placeholder="..." v-model="searchText">
-            <span class="input-group-text kjv-table__search-title" id="basic-addon2">Поиск</span>
+            <input id="KJVSearchText" type="text" class="form-control kjv-table__search-input" placeholder="..." v-model="searchText">
+            <label for="KJVSearchText" class="input-group-text kjv-table__search-clear" id="basic-addon2" @click="searchText = ''">{{ searchText.length == 0 ? 'Поиск' : '&times;' }}</label>
         </div>
 
         <div class="container has-rounded has-shadow kjv-table__data">
