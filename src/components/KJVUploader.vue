@@ -209,29 +209,31 @@ export default {
 
                                 const fileContent = JSON.parse(event.target.result)
 
-                                for(let target of fileContent) {
+                                for(let row of fileContent) {
 
                                     if(
-                                        'carNumber'     in target && 
-                                        'trainIndex'    in target && 
-                                        'trainNumber'   in target && 
-                                        'carStatus'     in target &&
-                                        'invoiceId'     in target && 
-                                        'invoiceNumber' in target && 
-                                        'stateId'       in target && 
-                                        'ordNumber'     in target
+                                        'carNumber'     in row && 
+                                        'trainIndex'    in row && 
+                                        'trainNumber'   in row && 
+                                        'carStatus'     in row &&
+                                        'invoiceId'     in row && 
+                                        'invoiceNumber' in row && 
+                                        'stateId'       in row && 
+                                        'lastOperDt'    in row &&
+                                        'ordNumber'     in row
                                     ) {
 
                                         rows.push({
 
-                                            carNumber:      target.carNumber,
-                                            trainIndex:     target.trainIndex,
-                                            trainNumber:    target.trainNumber,
-                                            carStatus:      target.carStatus,
-                                            invoiceId:      target.invoiceId,
-                                            invoiceNumber:  target.invoiceNumber,
-                                            stateId:        target.stateId,
-                                            ordNumber:      target.ordNumber
+                                            carNumber:      row.carNumber,
+                                            trainIndex:     row.trainIndex,
+                                            trainNumber:    row.trainNumber,
+                                            carStatus:      row.carStatus,
+                                            invoiceId:      row.invoiceId,
+                                            invoiceNumber:  row.invoiceNumber,
+                                            stateId:        row.stateId,
+                                            lastOperDt:     row.lastOperDt,
+                                            ordNumber:      row.ordNumber
                                         })
                                     }
                                 }
@@ -267,27 +269,29 @@ export default {
                                     ordNumber = Math.max.apply(null, allIDs) + 1
                                 }
 
-                                for(let target of fileContent) {
+                                for(let row of fileContent) {
 
                                     if(
-                                        'carNumber'     in target && 
-                                        'trainIndex'    in target && 
-                                        'trainNumber'   in target && 
-                                        'carStatus'     in target &&
-                                        'invoiceId'     in target && 
-                                        'invoiceNumber' in target && 
-                                        'stateId'       in target
+                                        'carNumber'     in row && 
+                                        'trainIndex'    in row && 
+                                        'trainNumber'   in row && 
+                                        'carStatus'     in row &&
+                                        'invoiceId'     in row && 
+                                        'invoiceNumber' in row && 
+                                        'lastOperDt'    in row &&
+                                        'stateId'       in row
                                     ) {
 
                                         rows.push({
 
-                                            carNumber:      target.carNumber,
-                                            trainIndex:     target.trainIndex,
-                                            trainNumber:    target.trainNumber,
-                                            carStatus:      target.carStatus,
-                                            invoiceId:      target.invoiceId,
-                                            invoiceNumber:  target.invoiceNumber,
-                                            stateId:        target.stateId,
+                                            carNumber:      row.carNumber,
+                                            trainIndex:     row.trainIndex,
+                                            trainNumber:    row.trainNumber,
+                                            carStatus:      row.carStatus,
+                                            invoiceId:      row.invoiceId,
+                                            invoiceNumber:  row.invoiceNumber,
+                                            stateId:        row.stateId,
+                                            lastOperDt:     row.lastOperDt,
                                             ordNumber:      ordNumber
                                         })
 

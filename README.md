@@ -1,21 +1,25 @@
-# KAN JSON Visualizator
+# KAN JSON Visualizator  
+Сервис анализа данных из массивов в JSON.
 
-## Project setup
+http://kjv.wr-team.ru/
+
+## Возможности  
+* просмотр данных в виде таблицы с возможность редактирования полей;
+* представление данных в виде диаграмы "пирог";
+* импорт/экспорт файлов данных;
+* комфотрная работа на любых экранах.
+
+## Установка 
 ```
 npm i
 ```
 
-### Compiles and hot-reloads for development
+### Запуск локального dev-сервера
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+### Сборка версии production
 ```
 npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
 ```
