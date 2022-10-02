@@ -6,11 +6,24 @@
 
         font-size: 0.75rem;
         color: lighten($text_main, 20%);
+
+        &-row {
+
+            background-color: #d0d4d6;
+        }
+
+        &-col {
+
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
     }
 
     &__row {
 
         background-color: #d0d4d6;
+        align-items: center;
 
         &--odd {
 

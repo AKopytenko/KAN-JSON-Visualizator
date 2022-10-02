@@ -20,16 +20,61 @@
                 <div class="col">
                     <div class="table m-0">
                         <div class="d-none d-xl-block table__head">
-                            <div class="row table__row">
-                                <div class="col-12 col-xl-1">№ п/п</div>
-                                <div class="col-12 col-xl-1">Номер вагона</div>
-                                <div class="col-12 col-xl-2">Индекс поезда</div>
-                                <div class="col-12 col-xl-1">Номер поезда</div>
-                                <div class="col-12 col-xl-2">Статус</div>
-                                <div class="col-12 col-xl-2">Дата-время операции</div>
-                                <div class="col-12 col-xl-1">№ накладной</div>
-                                <div class="col-12 col-xl-1">ИД накладной</div>
-                                <div class="col-12 col-xl-1 text-xl-end">stateId</div>
+                            <div class="row table__head-row">
+                                <div class="col-12 col-xl-1 table__head-col" @click="sortBy('ordNumber')">
+                                    № п/п
+                                    <span class="material-icons" v-if="orderedBy.ordNumber">
+                                        {{ orderedBy.ordNumber == 'asc' ? 'arrow_drop_down' : 'arrow_drop_up' }}
+                                    </span>
+                                </div>
+                                <div class="col-12 col-xl-1 table__head-col" @click="sortBy('carNumber')">
+                                    Номер вагона
+                                    <span class="material-icons" v-if="orderedBy.carNumber">
+                                        {{ orderedBy.carNumber == 'asc' ? 'arrow_drop_down' : 'arrow_drop_up' }}
+                                    </span>
+                                </div>
+                                <div class="col-12 col-xl-2 table__head-col" @click="sortBy('trainIndex')">
+                                    Индекс поезда
+                                    <span class="material-icons" v-if="orderedBy.trainIndex">
+                                        {{ orderedBy.trainIndex == 'asc' ? 'arrow_drop_down' : 'arrow_drop_up' }}
+                                    </span>
+                                </div>
+                                <div class="col-12 col-xl-1 table__head-col" @click="sortBy('trainNumber')">
+                                    Номер поезда
+                                    <span class="material-icons" v-if="orderedBy.trainNumber">
+                                        {{ orderedBy.trainNumber == 'asc' ? 'arrow_drop_down' : 'arrow_drop_up' }}
+                                    </span>
+                                </div>
+                                <div class="col-12 col-xl-2 table__head-col" @click="sortBy('carStatus')">
+                                    Статус
+                                    <span class="material-icons" v-if="orderedBy.carStatus">
+                                        {{ orderedBy.carStatus == 'asc' ? 'arrow_drop_down' : 'arrow_drop_up' }}
+                                    </span>
+                                </div>
+                                <div class="col-12 col-xl-2 table__head-col" @click="sortBy('lastOperDt')">
+                                    Дата-время операции
+                                    <span class="material-icons" v-if="orderedBy.lastOperDt">
+                                        {{ orderedBy.lastOperDt == 'asc' ? 'arrow_drop_down' : 'arrow_drop_up' }}
+                                    </span>
+                                </div>
+                                <div class="col-12 col-xl-1 table__head-col" @click="sortBy('invoiceNumber')">
+                                    № накладной
+                                    <span class="material-icons" v-if="orderedBy.invoiceNumber">
+                                        {{ orderedBy.invoiceNumber == 'asc' ? 'arrow_drop_down' : 'arrow_drop_up' }}
+                                    </span>
+                                </div>
+                                <div class="col-12 col-xl-1 table__head-col" @click="sortBy('invoiceId')">
+                                    ИД накладной
+                                    <span class="material-icons" v-if="orderedBy.invoiceId">
+                                        {{ orderedBy.invoiceId == 'asc' ? 'arrow_drop_down' : 'arrow_drop_up' }}
+                                    </span>
+                                </div>
+                                <div class="col-12 col-xl-1 text-xl-end table__head-col" @click="sortBy('stateId')">
+                                    stateId
+                                    <span class="material-icons" v-if="orderedBy.stateId">
+                                        {{ orderedBy.stateId == 'asc' ? 'arrow_drop_down' : 'arrow_drop_up' }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         <div class="table__body">
@@ -126,8 +171,20 @@ export default {
 
         return {
 
-            editRow:        null,
-            showEditRow:    false,
+            editRow: null,
+            showEditRow: false,
+
+            orderedBy: {
+
+                ordNumber: null,
+                carNumber: null,
+                trainIndex: null,
+                trainNumber: null,
+                lastOperDt: null,
+                invoiceNumber: null,
+                invoiceId: null,
+                stateId: null
+            },
 
             searchMode:     "all",
             searchText:     ""
@@ -153,7 +210,7 @@ export default {
 
             if(result) {
 
-                if(this.searchText.length > 2) {
+                if(this.searchText.length > 1) {
 
                     if(this.searchMode == 'all') {
 
@@ -182,6 +239,119 @@ export default {
             } else {
 
                 return []
+            }
+        }
+    },
+
+    methods: {
+
+        sortBy(mode) {
+
+            let orderDirection
+
+            // Изменение порядка сортировки
+            Object.keys(this.orderedBy).map(key => {
+                if(key !== mode) this.orderedBy[key] = null
+            })
+
+            if(this.orderedBy[mode] == 'asc') {
+                orderDirection = '<'
+                this.orderedBy[mode] = 'desc'
+            } else {
+                orderDirection = '>'
+                this.orderedBy[mode] = 'asc'
+            }
+
+            switch(mode) {
+
+                case 'ordNumber': this.filteredList.sort((cur, prev) => {
+                    return cur.ordNumber == prev.ordNumber ? 
+                        0 : 
+                        eval(cur.ordNumber + orderDirection + prev.ordNumber) ? 1 : -1
+                })
+                break
+
+                case 'carNumber': this.filteredList.sort((cur, prev) => {
+                    return cur.carNumber == prev.carNumber ? 
+                        0 :
+                        eval(cur.carNumber + orderDirection + prev.carNumber) ? 1 : -1
+                })
+                break
+
+                case 'trainIndex': this.filteredList.sort((cur, prev) => {
+                    cur = cur.trainIndex ? String(cur.trainIndex).replace(/^0+/, '') : 0
+                    prev = prev.trainIndex ? String(prev.trainIndex).replace(/^0+/, '') : 0
+                    return cur == prev ?
+                        0 :
+                        eval(cur + orderDirection + prev) ? 1 : -1
+                })
+                break
+
+                case 'trainNumber': this.filteredList.sort((cur, prev) => {
+                    return cur.trainNumber == prev.trainNumber ?
+                        0 :
+                        eval(cur.trainNumber + orderDirection + prev.trainNumber) ? 1 : -1
+                })
+                break
+
+                case 'carStatus': this.filteredList.sort((cur, prev) => {
+
+                    cur = cur.carStatus || ''
+                    prev = prev.carStatus || ''
+
+                    if(cur == prev) {
+
+                        return 0
+
+                    } else {
+
+                        return orderDirection == '>' ?
+                            cur > prev ? -1 : 1 :
+                            cur < prev ? -1 : 1
+                    }   
+                })
+                break
+
+                case 'lastOperDt': this.filteredList.sort((cur, prev) => {
+                    cur = new Date(cur.lastOperDt).getTime()
+                    prev = new Date(prev.lastOperDt).getTime()
+                    return cur == prev ?
+                        0 :
+                        eval(cur + orderDirection + prev) ? 1 : -1
+                })
+                break
+
+                case 'invoiceNumber': this.filteredList.sort((cur, prev) => {
+
+                    cur = cur.invoiceNumber || ''
+                    prev = prev.invoiceNumber || ''
+
+                    if(cur == prev) {
+
+                        return 0
+
+                    } else {
+
+                        return orderDirection == '>' ?
+                            cur > prev ? -1 : 1 :
+                            cur < prev ? -1 : 1
+                    }   
+                })
+                break
+
+                case 'invoiceId': this.filteredList.sort((cur, prev) => {
+                    return cur.invoiceId == prev.invoiceId ?
+                        0 :
+                        eval(cur.invoiceId + orderDirection + prev.invoiceId) ? 1 : -1
+                })
+                break
+
+                case 'stateId': this.filteredList.sort((cur, prev) => {
+                    return cur.stateId == prev.stateId ?
+                        0 :
+                        eval(cur.stateId + orderDirection + prev.stateId) ? 1 : -1
+                })
+                break
             }
         }
     }
