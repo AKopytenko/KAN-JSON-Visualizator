@@ -75,7 +75,7 @@
         </div>
 
         <div class="mt-4 btns text-end">
-            <button class="btn">Отмена</button>
+            <button class="btn" type="button" @click.prevent="$emit('closeModal')">Отмена</button>
             <button class="btn btn--primary ms-4" type="submit">Сохранить</button>
         </div>
 
