@@ -198,6 +198,7 @@ export default {
             if(this.trainNumber)    data.trainNumber    = this.trainNumber
             if(this.carStatus)      data.carStatus      = this.carStatus
             if(this.lastOperDt)     data.lastOperDt     = this.lastOperDt
+            if(this.stateId)        data.stateId        = this.stateId
 
             if(!this.formErrors.length) {
 
@@ -235,6 +236,11 @@ export default {
 
         this.setTableEditProcess(false)
         this.setTableEditMsg({})
-    }
+    },
+
+    emits: [
+
+        'closeModal'
+    ]
 }
 </script>

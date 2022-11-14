@@ -49,8 +49,6 @@ export default {
 
         if(localStorage.getItem('KJV_DATA')) {
 
-            console.log('Есть дата')
-
             this.readFile()
         }
     }

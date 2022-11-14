@@ -211,30 +211,25 @@ export default {
 
                                 for(let row of fileContent) {
 
-                                    if(
-                                        'carNumber'     in row && 
-                                        'trainIndex'    in row && 
-                                        'trainNumber'   in row && 
-                                        'carStatus'     in row &&
-                                        'invoiceId'     in row && 
-                                        'invoiceNumber' in row && 
-                                        'stateId'       in row && 
-                                        'lastOperDt'    in row &&
-                                        'ordNumber'     in row
-                                    ) {
+                                    if('carNumber' in row) {
 
                                         rows.push({
 
                                             carNumber:      row.carNumber,
-                                            trainIndex:     row.trainIndex,
-                                            trainNumber:    row.trainNumber,
-                                            carStatus:      row.carStatus,
-                                            invoiceId:      row.invoiceId,
-                                            invoiceNumber:  row.invoiceNumber,
-                                            stateId:        row.stateId,
-                                            lastOperDt:     row.lastOperDt,
-                                            ordNumber:      row.ordNumber
+                                            trainIndex:     row.trainIndex      || null,
+                                            trainNumber:    row.trainNumber     || null,
+                                            carStatus:      row.carStatus       || null,
+                                            invoiceId:      row.invoiceId       || null,
+                                            invoiceNumber:  row.invoiceNumber   || null,
+                                            stateId:        row.stateId         || null,
+                                            lastOperDt:     row.lastOperDt      || null,
+                                            ordNumber:      row.ordNumber       || null
                                         })
+
+                                    } else {
+
+                                        self.uploadFileMsg = { success: false, text: 'Ошибка! Проверьте правильность структуры данных в файле' }
+                                        return false
                                     }
                                 }
                             } catch {
@@ -271,27 +266,18 @@ export default {
 
                                 for(let row of fileContent) {
 
-                                    if(
-                                        'carNumber'     in row && 
-                                        'trainIndex'    in row && 
-                                        'trainNumber'   in row && 
-                                        'carStatus'     in row &&
-                                        'invoiceId'     in row && 
-                                        'invoiceNumber' in row && 
-                                        'lastOperDt'    in row &&
-                                        'stateId'       in row
-                                    ) {
+                                    if('carNumber' in row) {
 
                                         rows.push({
 
                                             carNumber:      row.carNumber,
-                                            trainIndex:     row.trainIndex,
-                                            trainNumber:    row.trainNumber,
-                                            carStatus:      row.carStatus,
-                                            invoiceId:      row.invoiceId,
-                                            invoiceNumber:  row.invoiceNumber,
-                                            stateId:        row.stateId,
-                                            lastOperDt:     row.lastOperDt,
+                                            trainIndex:     row.trainIndex      || null,
+                                            trainNumber:    row.trainNumber     || null,
+                                            carStatus:      row.carStatus       || null,
+                                            invoiceId:      row.invoiceId       || null,
+                                            invoiceNumber:  row.invoiceNumber   || null,
+                                            stateId:        row.stateId         || null,
+                                            lastOperDt:     row.lastOperDt      || null,
                                             ordNumber:      ordNumber
                                         })
 
