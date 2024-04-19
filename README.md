@@ -1,6 +1,6 @@
 # KAN JSON Visualizator  
 Сервис анализа данных из массивов в JSON.  
-Скачайте файл с [демо-данными](http://kjv.wr-team.ru/kjv-data-demo.txt) для демонстрации работы приложения.
+Скачайте файл с [демо-данными](https://wr-team.ru/demo/kjv/kjv-data-demo.txt) для демонстрации работы приложения.
 
 http://kjv.wr-team.ru/   
 
