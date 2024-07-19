@@ -33,4 +33,28 @@
             font-size: 2rem 
         }
     }
+
+    &__helper {
+
+        background: #d0d4d6;
+        padding-top: 0.75rem;
+        padding-bottom: 1rem;
+        color: #555;
+        font-size: 0.8rem;
+
+        &-list {
+
+            list-style: none;
+            margin: 0.5rem 0 0;
+            padding: 0;
+
+            &-item {
+
+                display: flex;
+                align-items: center;
+                background: url('@/assets/images/icons/arrow-right.png') no-repeat left center;
+                padding: 0 0 0 0.75rem;
+            }
+        }
+    }
 }

@@ -15,6 +15,18 @@
             <label for="KJVSearchText" class="input-group-text kjv-table__search-clear" id="basic-addon2" @click="searchText = ''">{{ searchText.length == 0 ? 'Поиск' : '&times;' }}</label>
         </div>
 
+        <div class="my-4 container has-rounded has-shadow kjv-table__helper">
+            <div class="row">   
+                <div class="col">
+                    <strong>Помощь:</strong>
+                    <ul class="kjv-table__helper-list">
+                        <li class="kjv-table__helper-list-item">Двойной клик по строке - переход к редактированию записи;</li>
+                        <li class="kjv-table__helper-list-item">Клик по заголовку колонки - сортировка.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
         <div class="container has-rounded has-shadow kjv-table__data">
             <div class="row">
                 <div class="col">
