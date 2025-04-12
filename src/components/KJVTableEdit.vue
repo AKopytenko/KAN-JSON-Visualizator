@@ -1,7 +1,5 @@
 <template>
-
     <form class="kjv-table-edit" action="" @submit.prevent="submitForm()">
-
         <div 
             class="alert" 
             :class="{
@@ -26,7 +24,6 @@
         </div>
 
         <div class="row">
-
             <div class="form-group mb-4 col-12 col-md-6">
                 <label for="ordNumber">№ п/п</label>
                 <input type="text" class="form-control" id="ordNumber" :value="editRow.ordNumber" disabled>
@@ -34,213 +31,155 @@
 
             <div class="form-group mb-4 col-12 col-md-6">
                 <label for="carNumber">Номер вагона</label>
-                <input type="text" class="form-control" id="carNumber" v-model="carNumber" :class="{ 'invalid' : formInvalids.carNumber }">
+                <input type="text" class="form-control" id="carNumber" v-model="formData.carNumber" :class="{ 'invalid' : formInvalids.carNumber }">
             </div>
 
             <div class="form-group mb-4 col-12 col-md-6">
                 <label for="trainIndex">Индекс поезда</label>
-                <input type="text" class="form-control" id="trainIndex" v-model="trainIndex">
+                <input type="text" class="form-control" id="trainIndex" v-model="formData.trainIndex">
             </div>
 
             <div class="form-group mb-4 col-12 col-md-6">
                 <label for="trainNumber">Номер поезда</label>
-                <input type="text" class="form-control" id="trainNumber" v-model="trainNumber">
+                <input type="text" class="form-control" id="trainNumber" v-model="formData.trainNumber">
             </div>
 
             <div class="form-group mb-4 col-12 col-md-6">
                 <label for="carStatus">Статус</label>
-                <input type="text" class="form-control" id="carStatus" v-model="carStatus">
+                <input type="text" class="form-control" id="carStatus" v-model="formData.carStatus">
             </div>
 
             <div class="form-group mb-4 col-12 col-md-6">
                 <label for="lastOperDt">Дата-время операции</label>
-                <input type="datetime-local" class="form-control" id="lastOperDt" v-model="lastOperDt">
+                <input type="datetime-local" class="form-control" id="lastOperDt" v-model="formData.lastOperDt">
             </div>
 
             <div class="form-group mb-4 col-12 col-md-6">
                 <label for="invoiceNumber">№ накладной</label>
-                <input type="text" class="form-control" id="invoiceNumber" v-model="invoiceNumber" :class="{ 'invalid' : formInvalids.invoiceNumber }">
+                <input type="text" class="form-control" id="invoiceNumber" v-model="formData.invoiceNumber" :class="{ 'invalid' : formInvalids.invoiceNumber }">
             </div>
 
             <div class="form-group mb-4 col-12 col-md-6">
                 <label for="invoiceId">ИД накладной</label>
-                <input type="text" class="form-control" id="invoiceId" v-model="invoiceId" :class="{ 'invalid' : formInvalids.invoiceId }">
+                <input type="text" class="form-control" id="invoiceId" v-model="formData.invoiceId" :class="{ 'invalid' : formInvalids.invoiceId }">
             </div>
 
             <div class="form-group mb-4 col-12 col-md-6">
                 <label for="stateId">stateId</label>
-                <input type="text" class="form-control" id="stateId" v-model="stateId">
+                <input type="text" class="form-control" id="stateId" v-model="formData.stateId">
             </div>
-
         </div>
 
         <div class="mt-4 btns text-end">
             <button class="btn" type="button" @click.prevent="$emit('closeModal')">Отмена</button>
             <button class="btn btn--primary ms-4" type="submit">Сохранить</button>
         </div>
-
     </form>
-
 </template>
 
-<script>
-import { mapActions, mapMutations, mapState } from 'vuex'
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { useTableStore } from '@/stores/table'
 
-export default {
+const tableStore = useTableStore()
 
-    name: 'KJVTableEdit',
+const props = defineProps({
+    editRow: {
+        type: Object,
+        required: true
+    }
+})
 
-    props: {
+// Реактивные данные формы
+const formData = ref({
+    carNumber:      '',
+    trainIndex:     '',
+    trainNumber:    '',
+    carStatus:      '',
+    invoiceId:      '',
+    invoiceNumber:  '',
+    stateId:        '',
+    lastOperDt:     ''
+})
 
-        editRow: {
+const formInvalids = ref({})
+const formErrors = ref([])
 
-            type: Object,
-            required: true
-        }
-    },
+const tableEditMsg = computed(() => tableStore.tableEditMsg)
 
-    data() {
-
-        return {
-
-            carNumber:      '',
-            trainIndex:     '',
-            trainNumber:    '',
-            carStatus:      '',
-            invoiceId:      '',
-            invoiceNumber:  '',
-            stateId:        '',
-            lastOperDt:     '',
-
-            formInvalids: {},
-            formErrors: []
-        }
-    },
-
-    computed: {
-
-        ...mapState({
-
-            tableEditPeocess:   state => state.table.tableEditPeocess,
-            tableEditMsg:       state => state.table.tableEditMsg
-        })
-    },
-
-    methods: {
-
-        ...mapActions([
-
-            'updateRow'
-        ]),
-
-        ...mapMutations([
-
-            'setTableEditProcess',
-            'setTableEditMsg'
-        ]),
-
-        /**
-         * setStartZero
-         * 
-         * Ставит ведущий ноль в месяц и число
-         * 
-         * @param {Number} value - входящее значение
-         * @return {String} - входящее число >=2 или двухзначное число с ведущим нулём
-         */
-        setStartZero(value) {
-
-            value = String(value)
-
-            return value.length == 1 ? '0' + value : value
-        },
-
-        submitForm() {
-
-            this.formInvalids = {}
-            this.formErrors = []
-
-            let data = {
-
-                ordNumber: this.editRow.ordNumber
-            }
-
-            if(this.carNumber.length) {
-
-                data.carNumber = this.carNumber
-
-            } else {
-
-                this.formInvalids.carNumber = true
-                this.formErrors.push("Не заполнено поле 'Номер вагона'")
-            }
-
-            if(this.invoiceNumber.length) {
-
-                data.invoiceNumber = this.invoiceNumber
-
-            } else {
-
-                this.formInvalids.invoiceNumber = true
-                this.formErrors.push("Не заполнено поле '№ накладной'")
-            }
-
-            if(this.invoiceId.length) {
-
-                data.invoiceId = this.invoiceId
-
-            } else {
-
-                this.formInvalids.invoiceId = true
-                this.formErrors.push("Не заполнено поле 'ИД накладной'")
-            }
-
-            if(this.trainIndex)     data.trainIndex     = this.trainIndex
-            if(this.trainNumber)    data.trainNumber    = this.trainNumber
-            if(this.carStatus)      data.carStatus      = this.carStatus
-            if(this.lastOperDt)     data.lastOperDt     = this.lastOperDt
-            if(this.stateId)        data.stateId        = this.stateId
-
-            if(!this.formErrors.length) {
-
-                this.updateRow(data)
-            }
-        }
-    },
-
-    mounted() {
-
-        this.carNumber      = this.editRow.carNumber
-        this.trainIndex     = this.editRow.trainIndex
-        this.trainNumber    = this.editRow.trainNumber
-        this.carStatus      = this.editRow.carStatus
-        this.invoiceId      = this.editRow.invoiceId
-        this.invoiceNumber  = this.editRow.invoiceNumber
-        this.stateId        = this.editRow.stateId
-
-        if(this.editRow.lastOperDt) {
-
-            const d     = new Date(this.editRow.lastOperDt)
-
-            let year    = d.getFullYear(),
-                month   = this.setStartZero(d.getMonth() + 1),
-                day     = this.setStartZero(d.getDate()),
-                hours   = d.getHours(),
-                minutes = d.getMinutes()
-
-            this.lastOperDt = `${year}-${month}-${day}T${hours}:${minutes}`
-
-        }
-    },
-
-    beforeUnmount() {
-
-        this.setTableEditProcess(false)
-        this.setTableEditMsg({})
-    },
-
-    emits: [
-
-        'closeModal'
-    ]
+const setStartZero = (value) => {
+    value = String(value)
+    return value.length == 1 ? '0' + value : value
 }
+
+const submitForm = () => {
+
+    formInvalids.value = {}
+    formErrors.value = []
+
+    let data = {
+        ordNumber: props.editRow.ordNumber
+    }
+
+    if(formData.value.carNumber.length) {
+        data.carNumber = formData.value.carNumber
+    } else {
+        formInvalids.value.carNumber = true
+        formErrors.value.push("Не заполнено поле 'Номер вагона'")
+    }
+
+    if(formData.value.invoiceNumber.length) {
+        data.invoiceNumber = formData.value.invoiceNumber
+    } else {
+        formInvalids.value.invoiceNumber = true
+        formErrors.value.push("Не заполнено поле '№ накладной'")
+    }
+
+    if(formData.value.invoiceId.length) {
+        data.invoiceId = formData.value.invoiceId
+    } else {
+        formInvalids.value.invoiceId = true
+        formErrors.value.push("Не заполнено поле 'ИД накладной'")
+    }
+
+    if(formData.value.trainIndex)     data.trainIndex     = formData.value.trainIndex
+    if(formData.value.trainNumber)    data.trainNumber    = formData.value.trainNumber
+    if(formData.value.carStatus)      data.carStatus      = formData.value.carStatus
+    if(formData.value.lastOperDt)     data.lastOperDt     = formData.value.lastOperDt
+    if(formData.value.stateId)        data.stateId        = formData.value.stateId
+
+    if(!formErrors.value.length) {
+        tableStore.updateTable(data)
+    }
+}
+
+onMounted(() => {
+
+    formData.value.carNumber        = props.editRow.carNumber
+    formData.value.trainIndex       = props.editRow.trainIndex
+    formData.value.trainNumber      = props.editRow.trainNumber
+    formData.value.carStatus        = props.editRow.carStatus
+    formData.value.invoiceId        = props.editRow.invoiceId
+    formData.value.invoiceNumber    = props.editRow.invoiceNumber
+    formData.value.stateId          = props.editRow.stateId
+
+    if(props.editRow.lastOperDt) {
+
+        const d = new Date(props.editRow.lastOperDt)
+
+        let year = d.getFullYear(),
+            month = setStartZero(d.getMonth() + 1),
+            day = setStartZero(d.getDate()),
+            hours = d.getHours(),
+            minutes = d.getMinutes()
+
+        formData.value.lastOperDt = `${year}-${month}-${day}T${hours}:${minutes}`
+    }
+})
+
+onBeforeUnmount(() => {
+
+    tableStore.setTableEditProcess(false)
+    tableStore.setTableEditMsg({})
+})
 </script>

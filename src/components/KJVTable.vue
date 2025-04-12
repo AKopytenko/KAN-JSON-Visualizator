@@ -170,206 +170,116 @@
 
 </template>
 
-<script>
-import { mapState } from 'vuex'
-import KJVModal     from '@/components/KJVModal'
+<script setup>
+import { computed, ref } from 'vue'
+import { useUploaderStore } from '@/stores/uploader'
+import KJVModal from '@/components/KJVModal'
 import KJVTableEdit from '@/components/KJVTableEdit'
 
-export default {
+const uploaderStore = useUploaderStore()
 
-    name: 'KJVTable',
+const editRow       = ref(null)
+const showEditRow   = ref(false)
+const orderedBy     = ref({
+    ordNumber:      null,
+    carNumber:      null,
+    trainIndex:     null,
+    trainNumber:    null,
+    lastOperDt:     null,
+    invoiceNumber:  null,
+    invoiceId:      null,
+    stateId:        null
+})
 
-    data() {
+const searchMode = ref("all")
+const searchText = ref("")
 
-        return {
+const uploadFile = computed(() => uploaderStore.uploadFile)
 
-            editRow: null,
-            showEditRow: false,
+const filteredList = computed(() => {
 
-            orderedBy: {
-
-                ordNumber: null,
-                carNumber: null,
-                trainIndex: null,
-                trainNumber: null,
-                lastOperDt: null,
-                invoiceNumber: null,
-                invoiceId: null,
-                stateId: null
-            },
-
-            searchMode:     "all",
-            searchText:     ""
+    let result = uploadFile.value
+    
+    if (!result) return []
+    
+    // Фильтрация по поиску
+    if (searchText.value.length > 1) {
+        if (searchMode.value === 'all') {
+            result = result.filter(item => 
+                String(item.carNumber).includes(searchText.value) || 
+                String(item.trainIndex).includes(searchText.value) || 
+                String(item.trainNumber).includes(searchText.value) || 
+                String(item.invoiceNumber).includes(searchText.value) || 
+                String(item.invoiceId).includes(searchText.value)
+            )
+        } else {
+            result = result.filter(item => 
+                String(item[searchMode.value]).includes(searchText.value)
+            )
         }
-    },
+    }
+    
+    // Сортировка
+    const sortKey = Object.keys(orderedBy.value).find(key => orderedBy.value[key])
+    if (sortKey) {
+        const direction = orderedBy.value[sortKey]
+        result = [...result].sort((a, b) => getComparator(a, b, sortKey, direction))
+    }
+    
+    return result
+})
 
-    components: {
+const getComparator = (a, b, sortKey, direction) => {
 
-        KJVModal,
-        KJVTableEdit
-    },
-
-    computed: {
-
-        ...mapState({
-
-            file: state => state.uploader.file
-        }),
-
-        filteredList() {
-
-            let result = this.file
-
-            if(result) {
-
-                if(this.searchText.length > 1) {
-
-                    if(this.searchMode == 'all') {
-
-                        result = this.file.filter(item => {
-
-                            if(
-                                String(item.carNumber).includes(this.searchText)        || 
-                                String(item.trainIndex).includes(this.searchText)       || 
-                                String(item.trainNumber).includes(this.searchText)      || 
-                                String(item.invoiceNumber).includes(this.searchText)    || 
-                                String(item.invoiceId).includes(this.searchText)
-                            ) {
-
-                                return item
-                            }
-                        })
-
-                    } else {
-
-                        result = this.file.filter(item => String(item[this.searchMode]).includes(this.searchText))
-                    }
-                }
-
-                return result
-
-            } else {
-
-                return []
-            }
+    const order = direction === 'asc' ? 1 : -1
+    
+    switch(sortKey) {
+        case 'ordNumber':
+        case 'carNumber':
+        case 'trainNumber':
+        case 'invoiceId':
+        case 'stateId':
+            return (a[sortKey] == b[sortKey] ? 0 : (a[sortKey] > b[sortKey] ? 1 : -1)) * order
+        
+        case 'trainIndex': {
+            const aVal = a.trainIndex ? String(a.trainIndex).replace(/^0+/, '') : 0
+            const bVal = b.trainIndex ? String(b.trainIndex).replace(/^0+/, '') : 0
+            return (aVal == bVal ? 0 : (aVal > bVal ? 1 : -1)) * order
         }
-    },
-
-    methods: {
-
-        sortBy(mode) {
-
-            let orderDirection
-
-            // Изменение порядка сортировки
-            Object.keys(this.orderedBy).map(key => {
-                if(key !== mode) this.orderedBy[key] = null
-            })
-
-            if(this.orderedBy[mode] == 'asc') {
-                orderDirection = '<'
-                this.orderedBy[mode] = 'desc'
-            } else {
-                orderDirection = '>'
-                this.orderedBy[mode] = 'asc'
-            }
-
-            switch(mode) {
-
-                case 'ordNumber': this.filteredList.sort((cur, prev) => {
-                    return cur.ordNumber == prev.ordNumber ? 
-                        0 : 
-                        eval(cur.ordNumber + orderDirection + prev.ordNumber) ? 1 : -1
-                })
-                break
-
-                case 'carNumber': this.filteredList.sort((cur, prev) => {
-                    return cur.carNumber == prev.carNumber ? 
-                        0 :
-                        eval(cur.carNumber + orderDirection + prev.carNumber) ? 1 : -1
-                })
-                break
-
-                case 'trainIndex': this.filteredList.sort((cur, prev) => {
-                    cur = cur.trainIndex ? String(cur.trainIndex).replace(/^0+/, '') : 0
-                    prev = prev.trainIndex ? String(prev.trainIndex).replace(/^0+/, '') : 0
-                    return cur == prev ?
-                        0 :
-                        eval(cur + orderDirection + prev) ? 1 : -1
-                })
-                break
-
-                case 'trainNumber': this.filteredList.sort((cur, prev) => {
-                    return cur.trainNumber == prev.trainNumber ?
-                        0 :
-                        eval(cur.trainNumber + orderDirection + prev.trainNumber) ? 1 : -1
-                })
-                break
-
-                case 'carStatus': this.filteredList.sort((cur, prev) => {
-
-                    cur = cur.carStatus || ''
-                    prev = prev.carStatus || ''
-
-                    if(cur == prev) {
-
-                        return 0
-
-                    } else {
-
-                        return orderDirection == '>' ?
-                            cur > prev ? -1 : 1 :
-                            cur < prev ? -1 : 1
-                    }   
-                })
-                break
-
-                case 'lastOperDt': this.filteredList.sort((cur, prev) => {
-                    cur = new Date(cur.lastOperDt).getTime()
-                    prev = new Date(prev.lastOperDt).getTime()
-                    return cur == prev ?
-                        0 :
-                        eval(cur + orderDirection + prev) ? 1 : -1
-                })
-                break
-
-                case 'invoiceNumber': this.filteredList.sort((cur, prev) => {
-
-                    cur = cur.invoiceNumber || ''
-                    prev = prev.invoiceNumber || ''
-
-                    if(cur == prev) {
-
-                        return 0
-
-                    } else {
-
-                        return orderDirection == '>' ?
-                            cur > prev ? -1 : 1 :
-                            cur < prev ? -1 : 1
-                    }   
-                })
-                break
-
-                case 'invoiceId': this.filteredList.sort((cur, prev) => {
-                    return cur.invoiceId == prev.invoiceId ?
-                        0 :
-                        eval(cur.invoiceId + orderDirection + prev.invoiceId) ? 1 : -1
-                })
-                break
-
-                case 'stateId': this.filteredList.sort((cur, prev) => {
-                    return cur.stateId == prev.stateId ?
-                        0 :
-                        eval(cur.stateId + orderDirection + prev.stateId) ? 1 : -1
-                })
-                break
-            }
+        
+        case 'carStatus':
+        case 'invoiceNumber': {
+            const aStr = a[sortKey] || ''
+            const bStr = b[sortKey] || ''
+            return (aStr === bStr ? 0 : (aStr > bStr ? 1 : -1)) * order
         }
+        
+        case 'lastOperDt': {
+            const aDate = new Date(a.lastOperDt).getTime()
+            const bDate = new Date(b.lastOperDt).getTime()
+            return (aDate == bDate ? 0 : (aDate > bDate ? 1 : -1)) * order
+        }
+        
+        default:
+            return 0
+    }
+}
+
+const sortBy = (mode) => {
+
+    // Изменение порядка сортировки
+    Object.keys(orderedBy.value).forEach(key => {
+        if (key !== mode) orderedBy.value[key] = null
+    })
+    
+    if (orderedBy.value[mode] === 'asc') {
+        orderedBy.value[mode] = 'desc'
+    } else {
+        orderedBy.value[mode] = 'asc'
     }
 }
 </script>
 
 <style lang="scss">
-@import '@/assets/styles/scss/components/kjv-table';
+@import '@/assets/styles/scss/components/kjv-table.scss';
 </style>

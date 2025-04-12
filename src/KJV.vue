@@ -1,58 +1,29 @@
 <template>
-
     <div class="container">
-
         <KJVTable />
-        <KJVDiagram v-if="file.length" />
+        <KJVDiagram v-if="uploadFile.length" />
         <KJVUploader />
-
     </div>
-
 </template>
 
-<script>
+<script setup>
+import { computed, onMounted } from 'vue'
+import { useUploaderStore } from '@/stores/uploader'
 
-import { mapActions, mapState } from 'vuex'
+import KJVTable from '@/components/KJVTable.vue'
+import KJVDiagram from '@/components/KJVDiagram.vue'
+import KJVUploader from '@/components/KJVUploader.vue'
 
-import KJVTable     from '@/components/KJVTable.vue'
-import KJVDiagram   from '@/components/KJVDiagram.vue'
-import KJVUploader  from '@/components/KJVUploader.vue'
+const uploaderStore = useUploaderStore()
 
-export default {
+const uploadFile = computed(() => uploaderStore.uploadFile)
 
-    name: 'KJV',
+onMounted(() => {
 
-    components: {
-
-        KJVTable,
-        KJVDiagram,
-        KJVUploader
-    },
-
-    computed: {
-
-        ...mapState({
-
-            file: state => state.uploader.file
-        })
-    },
-
-    methods: {
-
-        ...mapActions([
-
-            'readFile'
-        ])
-    },
-
-    mounted() {
-
-        if(localStorage.getItem('KJV_DATA')) {
-
-            this.readFile()
-        }
+    if (localStorage.getItem('KJV_DATA')) {
+        uploaderStore.readFile()
     }
-}
+})
 </script>
 
 <style lang="scss">

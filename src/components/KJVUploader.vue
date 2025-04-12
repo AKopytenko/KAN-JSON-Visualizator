@@ -1,18 +1,18 @@
 <template>
     <div class="kjv-uploader my-4 p-3">
-
         <div class="kjv-uploader__wrapper p-3 has-shadow has-rounded">
-
             <h3 class="kjv-uploader__header">Скачать / загрузить данные</h3>
-            <div class="kjv-uploader__descr">Вы можете загрузить данные для анализа из файла JSON, а так же скачать уже отредактированные данные в файл для конфиденциального переноса между устройствами без использования локальных сетей и Интернет.</div>
+            <div class="kjv-uploader__descr">
+                Вы можете загрузить данные для анализа из файла JSON, а так же скачать уже отредактированные данные в файл 
+                для конфиденциального переноса между устройствами без использования локальных сетей и Интернет.
+            </div>
 
             <div class="mt-3 btns kjv-uploader__buttons">
-
                 <button 
                     type="button"
                     class="btn btn-primary me-2 kjv-uploader__download"
                     :disabled="!file.length"
-                    @click.prevent="downloadFile()"
+                    @click.prevent="downloadFile"
                 >
                     Скачать
                 </button>
@@ -27,9 +27,7 @@
                 >
                     Загрузить
                 </button>
-
             </div>
-
         </div>
 
         <div class="modal fade kjv-uploader__modal" id="importFileModal" tabindex="-1" aria-labelledby="uploadFileModalLabel" aria-hidden="true">
@@ -105,224 +103,163 @@
     </div>
 </template>
 
-<script>
-import { mapState, mapMutations } from 'vuex'
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useUploaderStore } from '@/stores/uploader'
 
-export default {
+const uploaderStore = useUploaderStore();
 
-    name: 'ImportTargets',
+const invalidFields = ref({})
+const formErrors = ref([])
+const uploadFileMsg = ref(null)
 
-    data() {
+const file = computed(() => uploaderStore.uploadFile)
 
-        return {
+const downloadFile = () => {
 
-            invalidFields: {},
-            formErrors: [],
-            uploadFileMsg: null
+    const targetsString = JSON.stringify(file.value)
+    const targetsFile = new Blob([targetsString], {type: 'application/json'})
+    
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = ('0' + (Number(now.getMonth()) + 1)).slice(-2)
+    const day = ('0' + now.getDate()).slice(-2)
+    const hours = ('0' + now.getHours()).slice(-2)
+    const minutes = ('0' + now.getMinutes()).slice(-2)
+    const seconds = ('0' + now.getSeconds()).slice(-2)
+
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(targetsFile)
+    a.download = `KJVFileImport__${year}-${month}-${day}_${hours}-${minutes}-${seconds}.txt`
+    a.click()
+}
+
+const uploadFile = (event) => {
+
+    const fields = event.target.elements
+    let data = {}
+
+    invalidFields.value = {}
+    formErrors.value = []
+
+    if(fields.uploadFileMethod.value) {
+        data.method = fields.uploadFileMethod.value
+    } else {
+        invalidFields.value.uploadFileMethod = true
+        formErrors.value.push('Выберите тип загрузки')
+    }
+
+    if(fields.uploadFile.value) {
+        const file = fields.uploadFile.files[0]
+        const fileType = file.type
+        const fileExt = file.name.split('.').pop()
+        
+        if(fileType === 'text/plain' || fileExt === 'txt') {
+            data.file = file
+        } else {
+            invalidFields.value.uploadFile = true
+            formErrors.value.push('Неверный формат файла! Выберите файл с расширением *.txt')
         }
-    },
+    } else {
+        invalidFields.value.uploadFile = true
+        formErrors.value.push('Выберите файл для загрузки')
+    }
 
-    computed: {
+    if(formErrors.value.length === 0) {
+        const reader = new FileReader()
 
-        ...mapState({
+        reader.onload = (event) => {
+            try {
+                const fileContent = JSON.parse(event.target.result)
 
-            file: state => state.uploader.file
-        })
-    },
-
-    methods: {
-
-        ...mapMutations([
-
-            'setFile'
-        ]),
-
-        downloadFile() {
-
-            const targetsString = JSON.stringify(this.file)
-            const targetsFile = new Blob( [ targetsString ], {type: 'application/json'})
-            
-            let now     = new Date(),
-                year    = now.getFullYear(),
-                month   = ('0' + (Number(now.getMonth()) + 1)).slice(-2),
-                day     = ('0' + now.getDate()).slice(-2),
-                hours   = ('0' + now.getHours()).slice(-2),
-                minutes = ('0' + now.getMinutes()).slice(-2),
-                seconds = ('0' + now.getSeconds()).slice(-2)
-
-            let a = document.createElement('a')
-
-            a.href = URL.createObjectURL(targetsFile)
-            a.download = 'KJVFileImport__' + year + '-' + month + '-' + day + '_' + hours + '-' + minutes + '-' + seconds + '.txt'
-            a.click()
-        },
-
-        async uploadFile(event) {
-
-            const self = this
-            const fields = event.target.elements
-
-            let data = {}
-
-            this.invalidFields = {}
-            this.formErrors = []
-
-            if(fields.uploadFileMethod.value) {
-                data.method = fields.uploadFileMethod.value
-            } else {
-                this.invalidFields.uploadFileMethod = true
-                this.formErrors.push('Выберите тип загрузки')
-            }
-
-            if(fields.uploadFile.value) {
-                
-                let file     = fields.uploadFile.files[0],
-                    fileType = file.type,
-                    fileExt  = file.name.split('.')[1]
-
-                if( fileType == 'text/plain' || fileExt == 'txt' ) {
-                    data.file = fields.uploadFile.files[0]
+                if(data.method === 'rewrite') {
+                    processRewriteData(fileContent)
                 } else {
-                    this.invalidFields.uploadFile = true
-                    this.formErrors.push('Неверный формат файла! Выберите файл с расширением *.txt')
+                    processPushData(fileContent)
                 }
-            } else {
-                this.invalidFields.uploadFile = true
-                this.formErrors.push('Выберите файл для загрузки')
-            }
-
-            if(this.formErrors.length == 0) {
-
-                const reader = new FileReader()
-
-                let rows = []
-
-                switch( data.method ) {
-
-                    case 'rewrite':
-
-                        reader.readAsText(data.file)
-
-                        reader.onload = function(event) {
-
-                            try {
-
-                                const fileContent = JSON.parse(event.target.result)
-
-                                for(let row of fileContent) {
-
-                                    if('carNumber' in row) {
-
-                                        rows.push({
-
-                                            carNumber:      row.carNumber,
-                                            trainIndex:     row.trainIndex      || null,
-                                            trainNumber:    row.trainNumber     || null,
-                                            carStatus:      row.carStatus       || null,
-                                            invoiceId:      row.invoiceId       || null,
-                                            invoiceNumber:  row.invoiceNumber   || null,
-                                            stateId:        row.stateId         || null,
-                                            lastOperDt:     row.lastOperDt      || null,
-                                            ordNumber:      row.ordNumber       || null
-                                        })
-
-                                    } else {
-
-                                        self.uploadFileMsg = { success: false, text: 'Ошибка! Проверьте правильность структуры данных в файле' }
-                                        return false
-                                    }
-                                }
-                            } catch {
-
-                                self.uploadFileMsg = { success: false, text: 'Ошибка! Проверьте правильность структуры данных в файле' }
-                                return false
-                            }
-
-                            self.setFile(rows)
-
-                            self.uploadFileMsg = { success: true, text: 'Данные успешно загружены' }
-                        }
-
-                        break
-
-                    case 'push':
-
-                        reader.readAsText(data.file)
-
-                        reader.onload = function(event) {
-
-                            try {
-
-                                const fileContent = JSON.parse(event.target.result)
-
-                                let ordNumber = 1
-
-                                if(self.file.length) {
-
-                                    const allIDs = self.file.map( row => row.ordNumber )
-
-                                    ordNumber = Math.max.apply(null, allIDs) + 1
-                                }
-
-                                for(let row of fileContent) {
-
-                                    if('carNumber' in row) {
-
-                                        rows.push({
-
-                                            carNumber:      row.carNumber,
-                                            trainIndex:     row.trainIndex      || null,
-                                            trainNumber:    row.trainNumber     || null,
-                                            carStatus:      row.carStatus       || null,
-                                            invoiceId:      row.invoiceId       || null,
-                                            invoiceNumber:  row.invoiceNumber   || null,
-                                            stateId:        row.stateId         || null,
-                                            lastOperDt:     row.lastOperDt      || null,
-                                            ordNumber:      ordNumber
-                                        })
-
-                                        ordNumber++
-                                    }
-                                }
-                            } catch {
-
-                                self.uploadFileMsg = { success: false, text: 'Ошибка! Проверьте правильность структуры данных в файле' }
-                                return false
-                            }
-
-                            rows = [...self.file, ...rows]
-
-                            self.setFile(rows)
-
-                            self.uploadFileMsg = { success: true, text: 'Данные успешно загружены' }
-                        }
-
-                        break
+            } catch {
+                uploadFileMsg.value = { 
+                    success: false, 
+                    text: 'Ошибка! Проверьте правильность структуры данных в файле' 
                 }
-
             }
-        },
-
-        checkValid(event) {
-
-            event.target.classList.remove('is-invalid')
         }
-    },
 
-    mounted() {
-
-        const self = this
-        const importFileModal = document.getElementById('importFileModal')
-
-        importFileModal.addEventListener('show.bs.modal', function () {
-
-            self.formErrors = []
-            self.invalidFields = {}
-            self.uploadFileMsg = null
-            document.querySelector('#uploadFileForm').reset()
-        })
+        reader.readAsText(data.file)
     }
 }
+
+const processRewriteData = (fileContent) => {
+
+    const rows = fileContent.map(row => {
+
+        if(!('carNumber' in row)) {
+            throw new Error('Invalid data structure')
+        }
+        
+        return {
+            carNumber: row.carNumber,
+            trainIndex: row.trainIndex || null,
+            trainNumber: row.trainNumber || null,
+            carStatus: row.carStatus || null,
+            invoiceId: row.invoiceId || null,
+            invoiceNumber: row.invoiceNumber || null,
+            stateId: row.stateId || null,
+            lastOperDt: row.lastOperDt || null,
+            ordNumber: row.ordNumber || null
+        }
+    })
+
+    uploaderStore.setFile(rows)
+    uploadFileMsg.value = { success: true, text: 'Данные успешно загружены' }
+}
+
+const processPushData = (fileContent) => {
+
+    let ordNumber = 1
+
+    if(file.value.length) {
+        const allIDs = file.value.map(row => row.ordNumber)
+        ordNumber = Math.max(...allIDs) + 1
+    }
+
+    const newRows = fileContent.map(row => {
+        if(!('carNumber' in row)) {
+            throw new Error('Invalid data structure')
+        }
+
+        return {
+            carNumber: row.carNumber,
+            trainIndex: row.trainIndex || null,
+            trainNumber: row.trainNumber || null,
+            carStatus: row.carStatus || null,
+            invoiceId: row.invoiceId || null,
+            invoiceNumber: row.invoiceNumber || null,
+            stateId: row.stateId || null,
+            lastOperDt: row.lastOperDt || null,
+            ordNumber: ordNumber++
+        }
+    })
+
+    const combinedRows = [...file.value, ...newRows]
+    uploaderStore.setFile(combinedRows)
+    uploadFileMsg.value = { success: true, text: 'Данные успешно загружены' }
+}
+
+const checkValid = (event) => {
+    event.target.classList.remove('is-invalid')
+}
+
+onMounted(() => {
+    const importFileModal = document.getElementById('importFileModal')
+    
+    importFileModal.addEventListener('show.bs.modal', () => {
+        formErrors.value = []
+        invalidFields.value = {}
+        uploadFileMsg.value = null
+        document.querySelector('#uploadFileForm').reset()
+    })
+})
 </script>
 
 <style lang="scss">
