@@ -43,6 +43,8 @@ const props = defineProps({
     }
 });
 
+const emit = defineEmits(['closeModal']);
+
 const containerClasses = computed(() => ({
     'kjv-modal__container--md': props.size === 'md',
     'kjv-modal__container--lg': props.size === 'lg',
@@ -54,13 +56,13 @@ let modal = null;
 const handleClickOutside = (event) => {
     const modalBody = document.querySelector('.kjv-modal__container');
     if (!modalBody.contains(event.target)) {
-        this.$emit('closeModal', true)
+        emit('closeModal', true)
     }
 };
 
-const handleEscapeKey = (event) => {
+const handleEscapeKey = event => {
     if (event.code === "Escape") {
-        this.$emit('closeModal', true)
+        emit('closeModal', true)
     }
 };
 

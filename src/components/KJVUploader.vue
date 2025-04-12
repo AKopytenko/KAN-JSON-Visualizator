@@ -105,15 +105,15 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useStore } from 'vuex'
+import { useUploaderStore } from '@/stores/uploader'
 
-const store = useStore()
+const uploaderStore = useUploaderStore();
 
 const invalidFields = ref({})
 const formErrors = ref([])
 const uploadFileMsg = ref(null)
 
-const file = computed(() => store.state.uploader.file)
+const file = computed(() => uploaderStore.uploadFile)
 
 const downloadFile = () => {
 
@@ -210,7 +210,7 @@ const processRewriteData = (fileContent) => {
         }
     })
 
-    store.commit('setFile', rows)
+    uploaderStore.setFile(rows)
     uploadFileMsg.value = { success: true, text: 'Данные успешно загружены' }
 }
 
@@ -242,7 +242,7 @@ const processPushData = (fileContent) => {
     })
 
     const combinedRows = [...file.value, ...newRows]
-    store.commit('setFile', combinedRows)
+    uploaderStore.setFile(combinedRows)
     uploadFileMsg.value = { success: true, text: 'Данные успешно загружены' }
 }
 

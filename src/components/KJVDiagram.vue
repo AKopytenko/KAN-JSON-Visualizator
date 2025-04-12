@@ -15,10 +15,10 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue';
-import { useStore } from 'vuex';
+import { useUploaderStore } from '@/stores/uploader'
 
-const store = useStore();
-const file = computed(() => store.state.uploader.file);
+const uploaderStore = useUploaderStore();
+const uploadFile = computed(() => uploaderStore.uploadFile);
 
 const chartSeries = ref([]);
 const chartLabels = ref([]);
@@ -34,7 +34,7 @@ const chartOptions = computed(() => ({
 onMounted(() => {
     const labels = {};
 
-    file.value.forEach(item => {
+    uploadFile.value.forEach(item => {
         if (!labels[item.stateId]) {
             labels[item.stateId] = [item];
         } else {

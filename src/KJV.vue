@@ -1,29 +1,27 @@
 <template>
     <div class="container">
         <KJVTable />
-        <KJVDiagram v-if="file.length" />
+        <KJVDiagram v-if="uploadFile.length" />
         <KJVUploader />
     </div>
 </template>
 
 <script setup>
 import { computed, onMounted } from 'vue'
-import { useStore } from 'vuex'
+import { useUploaderStore } from '@/stores/uploader'
 
 import KJVTable from '@/components/KJVTable.vue'
 import KJVDiagram from '@/components/KJVDiagram.vue'
 import KJVUploader from '@/components/KJVUploader.vue'
 
-const store = useStore()
+const uploaderStore = useUploaderStore()
 
-const file = computed(() => store.state.uploader.file)
-
-const readFile = () => store.dispatch('readFile')
+const uploadFile = computed(() => uploaderStore.uploadFile)
 
 onMounted(() => {
 
     if (localStorage.getItem('KJV_DATA')) {
-        readFile()
+        uploaderStore.readFile()
     }
 })
 </script>

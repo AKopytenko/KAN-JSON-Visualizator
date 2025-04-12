@@ -172,16 +172,15 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { useStore } from 'vuex'
+import { useUploaderStore } from '@/stores/uploader'
 import KJVModal from '@/components/KJVModal'
 import KJVTableEdit from '@/components/KJVTableEdit'
 
-const store = useStore()
+const uploaderStore = useUploaderStore()
 
-const editRow = ref(null)
-const showEditRow = ref(false)
-
-const orderedBy = ref({
+const editRow       = ref(null)
+const showEditRow   = ref(false)
+const orderedBy     = ref({
     ordNumber:      null,
     carNumber:      null,
     trainIndex:     null,
@@ -195,11 +194,11 @@ const orderedBy = ref({
 const searchMode = ref("all")
 const searchText = ref("")
 
-const file = computed(() => store.state.uploader.file)
+const uploadFile = computed(() => uploaderStore.uploadFile)
 
 const filteredList = computed(() => {
 
-    let result = file.value
+    let result = uploadFile.value
     
     if (!result) return []
     

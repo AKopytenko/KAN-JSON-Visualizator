@@ -79,7 +79,9 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import { useStore } from 'vuex'
+import { useTableStore } from '@/stores/table'
+
+const tableStore = useTableStore()
 
 const props = defineProps({
     editRow: {
@@ -87,8 +89,6 @@ const props = defineProps({
         required: true
     }
 })
-
-const store = useStore()
 
 // Реактивные данные формы
 const formData = ref({
@@ -105,7 +105,7 @@ const formData = ref({
 const formInvalids = ref({})
 const formErrors = ref([])
 
-const tableEditMsg = computed(() => store.state.table.tableEditMsg)
+const tableEditMsg = computed(() => tableStore.tableEditMsg)
 
 const setStartZero = (value) => {
     value = String(value)
@@ -149,7 +149,7 @@ const submitForm = () => {
     if(formData.value.stateId)        data.stateId        = formData.value.stateId
 
     if(!formErrors.value.length) {
-        store.dispatch('updateRow', data)
+        tableStore.updateTable(data)
     }
 }
 
@@ -178,7 +178,8 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-    store.commit('setTableEditProcess', false)
-    store.commit('setTableEditMsg', {})
+
+    tableStore.setTableEditProcess(false)
+    tableStore.setTableEditMsg({})
 })
 </script>
